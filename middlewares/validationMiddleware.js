@@ -35,20 +35,4 @@ module.exports = {
     }
     next();
   },
-
-  patchContactValidation: (req, res, next) => {
-    const schema = Joi.object({
-      name: Joi.string().min(3).max(30).optional(),
-      email: Joi.string().min(3).max(30).optional(),
-      phone: Joi.number().min(3).optional(),
-    });
-
-    const validationResult = schema.validate(req.body);
-    if (validationResult.error) {
-      return res.status(400).json({
-        status: validationResult.error.details,
-      });
-    }
-    next();
-  },
 };

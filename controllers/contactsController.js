@@ -70,19 +70,13 @@ const removeContact = async (req, res, next) => {
   res.status(200).json({ deletedContact, message: "Contact deleted" });
 };
 
-const changeContact = async (req, res, next) => {
+const updateContact = async (req, res, next) => {
   const { name, email, phone } = req.body;
   const contacts = await readContent();
-  contacts.forEach((contact) => {
-    if (contact.id === req.params.contactId) {
-      contact.name = name;
-      contact.email = email;
-      contact.phone = phone;
-    }
-  });
   const newContact = contacts.find(
     (contact) => contact.id === req.params.contactId
   );
+  newContact = { ...newContact, name, email, phone };
   await fs.writeFile(
     path.join(__dirname, "contacts.json"),
     JSON.stringify(contacts, null, 2)
@@ -95,42 +89,10 @@ const changeContact = async (req, res, next) => {
   }
 };
 
-const updateContact = async (req, res, next) => {
-  const { name, email, phone } = req.body;
-  const contacts = await readContent();
-  contacts.forEach((contact) => {
-    if (contact.id === req.params.contactId) {
-      if (name) {
-        contact.name = name;
-      }
-      if (email) {
-        contact.email = email;
-      }
-      if (phone) {
-        contact.phone = phone;
-      }
-    }
-  });
-  const updateContact = contacts.find(
-    (contact) => contact.id === req.params.contactId
-  );
-  await fs.writeFile(
-    path.join(__dirname, "contacts.json"),
-    JSON.stringify(contacts, null, 2)
-  );
-
-  if (updateContact) {
-    res.status(200).json({ updateContact, status: "Contact updated" });
-  } else {
-    res.status(404).json({ message: "Not found" });
-  }
-};
-
 module.exports = {
   listContacts,
   getById,
   removeContact,
   addContact,
-  changeContact,
   updateContact,
 };
