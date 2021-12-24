@@ -1,15 +1,15 @@
-const app = require("../app");
+const app = require('../app')
 
-const { connectMongo } = require("../db/connection");
+const { connectMongo } = require('../db/connection')
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000
 
 const start = async () => {
-  await connectMongo();
+  await connectMongo()
 
   app.listen(PORT, () => {
-    console.log(`Server running. Use our API on port: ${PORT}`);
-  });
-};
+    console.log(`Server running. Use our API on port: ${PORT}`)
+  })
+}
 
-start();
+start()

@@ -1,5 +1,5 @@
-require("dotenv").config();
-const mongoose = require("mongoose");
+require('dotenv').config()
+const mongoose = require('mongoose')
 
 const connectMongo = async () => {
   return mongoose.connect(
@@ -10,15 +10,14 @@ const connectMongo = async () => {
     },
     (err) => {
       if (err) {
-        console.log("err:", err);
-        process.exit(1);
+        console.log('err:', err)
+        process.exit(1)
       }
       if (!err) {
-        console.log("Database connection successful");
+        console.log('Database connection successful')
       }
     }
-  );
-  
-};
+  )
+}
 
-module.exports = { connectMongo };
+module.exports = { connectMongo }

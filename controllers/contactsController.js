@@ -1,10 +1,7 @@
-const crypto = require("crypto");
-const fs = require("fs/promises");
-const path = require("path");
 const { Contact } = require("../db/contactsModel");
 
 const listContacts = async (req, res, next) => {
-    const contacts = await Contact.find({});
+  const contacts = await Contact.find({});
   res.status(200).json({ contacts, status: "success" });
 };
 
@@ -26,14 +23,14 @@ const addContact = async (req, res, next) => {
   const { name, email, phone, favorite = false } = req.body;
   const contacts = new Contact({ name, email, phone, favorite });
 
-    await contacts.save();
+  await contacts.save();
 
   const newContact = { name, email, phone, favorite };
-    res.status(201).json({ newContact, status: "success" });
+  res.status(201).json({ newContact, status: "success" });
 };
 
 const removeContact = async (req, res, next) => {
-   const { contactId } = req.params;
+  const { contactId } = req.params;
   const deletedContact = await Contact.findByIdAndRemove(contactId);
 
   if (!deletedContact) {
@@ -42,7 +39,7 @@ const removeContact = async (req, res, next) => {
       .json({ message: `Not found contact with id '${contactId}'` });
     return;
   }
-    res.status(200).json({ deletedContact, message: "Contact deleted" });
+  res.status(200).json({ deletedContact, message: "Contact deleted" });
 };
 
 const updateContact = async (req, res, next) => {
@@ -52,7 +49,7 @@ const updateContact = async (req, res, next) => {
   const newContact = await Contact.findByIdAndUpdate(contactId, {
     $set: { name, email, phone, favorite },
   });
-  
+
   if (newContact) {
     res.status(200).json({ newContact, status: "Contact changed" });
   } else {
@@ -68,7 +65,7 @@ const updateStatusContact = async (req, res, next) => {
     $set: { favorite },
   });
 
-    if (changedContact) {
+  if (changedContact) {
     res.status(200).json({ changedContact, status: "Contact changed" });
   } else {
     res.status(404).json({ message: "Not found" });
