@@ -1,11 +1,11 @@
 const express = require("express");
-
 const router = express.Router();
 
 const {
   addContactValidation,
   putContactValidation,
   validateUpdateFavorite,
+  validateId,
 } = require("../../middlewares/validationMiddleware");
 
 const {
@@ -18,12 +18,13 @@ const {
 } = require("../../controllers/contactsController");
 
 router.get("/", listContacts);
-router.get("/:contactId", getById);
+router.get("/:contactId", validateId, getById);
 router.post("/", addContactValidation, addContact);
-router.delete("/:contactId", removeContact);
-router.put("/:contactId", putContactValidation, updateContact);
+router.delete("/:contactId", validateId, removeContact);
+router.put("/:contactId", validateId, putContactValidation, updateContact);
 router.patch(
   "/:contactId/favorite",
+  validateId,
   validateUpdateFavorite,
   updateStatusContact
 );

@@ -21,11 +21,9 @@ const getById = async (req, res, next) => {
 
 const addContact = async (req, res, next) => {
   const { name, email, phone, favorite = false } = req.body;
-  const contacts = new Contact({ name, email, phone, favorite });
-
-  await contacts.save();
-
   const newContact = { name, email, phone, favorite };
+  const contacts = new Contact(newContact);
+  await contacts.save();
   res.status(201).json({ newContact, status: "success" });
 };
 
