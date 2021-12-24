@@ -1,25 +1,17 @@
 const crypto = require("crypto");
 const fs = require("fs/promises");
 const path = require("path");
-
-let readContent = async () => {
-  const content = await fs.readFile(
-    path.join(__dirname, "contacts.json"),
-    "utf8"
-  );
-  const result = JSON.parse(content);
-  return result;
-};
+const { Contact } = require("../db/contactsModel");
 
 const listContacts = async (req, res, next) => {
-  const contacts = await readContent();
+    const contacts = await Contact.find({});
   res.status(200).json({ contacts, status: "success" });
 };
 
 const getById = async (req, res, next) => {
   const { contactId } = req.params;
-  const contacts = await readContent();
-  const contact = contacts.find((item) => item.id === contactId);
+
+  const contact = await Contact.findById(contactId);
 
   if (!contact) {
     return res
@@ -31,59 +23,53 @@ const getById = async (req, res, next) => {
 };
 
 const addContact = async (req, res, next) => {
-  const contacts = await readContent();
-  const { name, email, phone } = req.body;
+  const { name, email, phone, favorite = false } = req.body;
+  const contacts = new Contact({ name, email, phone, favorite });
 
-  const newContact = { id: crypto.randomUUID(), name, email, phone };
+    await contacts.save();
 
-  contacts.push(newContact);
-  await fs.writeFile(
-    path.join(__dirname, "contacts.json"),
-    JSON.stringify(contacts, null, 2)
-  );
-
-  res.status(201).json({ newContact, status: "success" });
+  const newContact = { name, email, phone, favorite };
+    res.status(201).json({ newContact, status: "success" });
 };
 
 const removeContact = async (req, res, next) => {
-  const contacts = await readContent();
-  const deletedContact = contacts.find(
-    (contact) => contact.id === req.params.contactId
-  );
+   const { contactId } = req.params;
+  const deletedContact = await Contact.findByIdAndRemove(contactId);
 
   if (!deletedContact) {
     res
       .status(404)
-      .json({ message: `Not found contact with id '${req.params.contactId}'` });
+      .json({ message: `Not found contact with id '${contactId}'` });
     return;
   }
-
-  const finalList = contacts.filter(
-    (contact) => contact.id !== req.params.contactId
-  );
-
-  await fs.writeFile(
-    path.join(__dirname, "contacts.json"),
-    JSON.stringify(finalList, null, 2)
-  );
-
-  res.status(200).json({ deletedContact, message: "Contact deleted" });
+    res.status(200).json({ deletedContact, message: "Contact deleted" });
 };
 
 const updateContact = async (req, res, next) => {
-  const { name, email, phone } = req.body;
-  const contacts = await readContent();
-  const newContact = contacts.find(
-    (contact) => contact.id === req.params.contactId
-  );
-  newContact = { ...newContact, name, email, phone };
-  await fs.writeFile(
-    path.join(__dirname, "contacts.json"),
-    JSON.stringify(contacts, null, 2)
-  );
+  const { name, email, phone, favorite } = req.body;
+  const { contactId } = req.params;
 
+  const newContact = await Contact.findByIdAndUpdate(contactId, {
+    $set: { name, email, phone, favorite },
+  });
+  
   if (newContact) {
     res.status(200).json({ newContact, status: "Contact changed" });
+  } else {
+    res.status(404).json({ message: "Not found" });
+  }
+};
+
+const updateStatusContact = async (req, res, next) => {
+  const { favorite } = req.body;
+  const { contactId } = req.params;
+
+  const changedContact = await Contact.findByIdAndUpdate(contactId, {
+    $set: { favorite },
+  });
+
+    if (changedContact) {
+    res.status(200).json({ changedContact, status: "Contact changed" });
   } else {
     res.status(404).json({ message: "Not found" });
   }
@@ -95,4 +81,5 @@ module.exports = {
   removeContact,
   addContact,
   updateContact,
+  updateStatusContact,
 };
