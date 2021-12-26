@@ -1,63 +1,64 @@
-const Joi = require("joi");
-const { Types } = require("mongoose");
+import Joi from "joi";
+import mongoose from "mongoose";
 
-module.exports = {
-  addContactValidation: (req, res, next) => {
-    const schema = Joi.object({
-      name: Joi.string().min(3).max(30).required(),
-      email: Joi.string().min(3).max(30).required(),
-      phone: Joi.number().min(3).required(),
-      favorite: Joi.bool(),
-    });
+const { Types } = mongoose;
 
-    const validationResult = schema.validate(req.body);
-    if (validationResult.error) {
-      return res.status(400).json({
-        message: "Missing required name field",
-        status: validationResult.error.details,
-      });
+const postSchema = Joi.object({
+  name: Joi.string().required(),
+  email: Joi.string().email().required(),
+  phone: Joi.string().required(),
+  favorite: Joi.bool().optional(),
+});
+
+const updateSchema = Joi.object({
+  name: Joi.string().optional(),
+  email: Joi.string().email().optional(),
+  phone: Joi.string().optional(),
+  favorite: Joi.bool().optional(),
+}).or("name", "email", "phone");
+
+const patchSchema = Joi.object({
+  favorite: Joi.bool().required(),
+});
+
+export const validateCreate = async (req, res, next) => {
+  try {
+    await postSchema.validateAsync(req.body);
+  } catch (err) {
+    return res.status(400).json({ message: err.message.replace(/"/g, "") });
+  }
+  next();
+};
+
+export const validateUpdate = async (req, res, next) => {
+  try {
+    await updateSchema.validateAsync(req.body);
+  } catch (err) {
+    const [{ type }] = err.details;
+    if (type === "object.missing") {
+      return res.status(400).json({ message: err.message });
     }
+    return res.status(400).json({ message: "missing fields" });
+  }
+  next();
+};
 
-    next();
-  },
-
-  putContactValidation: (req, res, next) => {
-    const schema = Joi.object({
-      name: Joi.string().min(3).max(30).required(),
-      email: Joi.string().min(3).max(30).required(),
-      phone: Joi.number().min(3).required(),
-      favorite: Joi.bool(),
-    });
-
-    const validationResult = schema.validate(req.body);
-    if (validationResult.error) {
-      return res.status(400).json({
-        message: "Missing fields",
-        status: validationResult.error.details,
-      });
+export const validateUpdateFavorite = async (req, res, next) => {
+  try {
+    await patchSchema.validateAsync(req.body);
+  } catch (err) {
+    const [{ type }] = err.details;
+    if (type === "object.missing") {
+      return res.status(400).json({ message: err.message });
     }
-    next();
-  },
+    return res.status(400).json({ message: "Missing field favorite" });
+  }
+  next();
+};
 
-  validateUpdateFavorite: (req, res, next) => {
-    const schema = Joi.object({
-      favorite: Joi.bool().required(),
-    });
-
-    const validationResult = schema.validate(req.body);
-    if (validationResult.error) {
-      return res.status(400).json({
-        message: "Missing field favorite",
-        status: validationResult.error.details,
-      });
-    }
-    next();
-  },
-
-  validateId: (req, res, next) => {
-    if (!Types.ObjectId.isValid(req.params.contactId)) {
-      return res.status(400).json({ message: "Invalid ObjectId" });
-    }
-    next();
-  },
+export const validateId = (req, res, next) => {
+  if (!Types.ObjectId.isValid(req.params.contactId)) {
+    return res.status(400).json({ message: "Invalid ObjectId" });
+  }
+  next();
 };
