@@ -21,6 +21,12 @@ const patchSchema = Joi.object({
   favorite: Joi.bool().required(),
 });
 
+const querySchema = Joi.object({
+  limit: Joi.string().min(5).max(100).optional(),
+  skip: Joi.number().min(0).optional(),
+  filter: Joi.string().pattern(new RegExp("(favorite)")).optional(),
+});
+
 export const validateCreate = async (req, res, next) => {
   try {
     await postSchema.validateAsync(req.body);
@@ -59,6 +65,15 @@ export const validateUpdateFavorite = async (req, res, next) => {
 export const validateId = (req, res, next) => {
   if (!Types.ObjectId.isValid(req.params.contactId)) {
     return res.status(400).json({ message: "Invalid ObjectId" });
+  }
+  next();
+};
+
+export const validateQuery = async (req, res, next) => {
+  try {
+    await querySchema.validateAsync(req.query);
+  } catch (err) {
+    return res.status(400).json({ message: err.message.replace(/"/g, "") });
   }
   next();
 };

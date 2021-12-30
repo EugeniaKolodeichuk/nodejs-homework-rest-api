@@ -6,6 +6,7 @@ import {
   validateUpdate,
   validateId,
   validateUpdateFavorite,
+  validateQuery,
 } from "../../middlewares/validationMiddleware.js";
 
 import {
@@ -16,20 +17,21 @@ import {
   updateContact,
 } from "../../controllers/contactsController.js";
 
-router.get("/", listContacts);
+import guard from "../../middlewares/guard.js";
 
-router.get("/:contactId", validateId, getById);
+router.get("/", [guard, validateQuery], listContacts);
 
-router.post("/", validateCreate, addContact);
+router.get("/:contactId", [guard, validateId], getById);
 
-router.delete("/:contactId", validateId, removeContact);
+router.post("/", [guard, validateCreate], addContact);
 
-router.put("/:contactId", validateId, validateUpdate, updateContact);
+router.delete("/:contactId", [guard, validateId], removeContact);
+
+router.put("/:contactId", [guard, validateId, validateUpdate], updateContact);
 
 router.patch(
   "/:contactId/favorite",
-  validateId,
-  validateUpdateFavorite,
+  [guard, validateId, validateUpdateFavorite],
   updateContact
 );
 

@@ -2,10 +2,10 @@ import repositoryContacts from "../repository/contactsRepository.js";
 import { httpCode } from "../lib/constants.js";
 
 const listContacts = async (req, res, next) => {
-  const contacts = await repositoryContacts.listContacts();
+  const contacts = await repositoryContacts.listContacts(req.query);
   res
     .status(httpCode.OK)
-    .json({ status: "success", code: httpCode.OK, data: { contacts } });
+    .json({ status: "success", code: httpCode.OK, data: { ...contacts } });
 };
 
 const getById = async (req, res, next) => {
