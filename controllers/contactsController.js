@@ -2,23 +2,24 @@ import repositoryContacts from "../repository/contactsRepository.js";
 import { httpCode } from "../lib/constants.js";
 
 const listContacts = async (req, res, next) => {
-  const contacts = await repositoryContacts.listContacts(req.query);
+  const { id: userId } = req.user;
+  const contacts = await repositoryContacts.listContacts(userId, req.query);
   res
     .status(httpCode.OK)
     .json({ status: "success", code: httpCode.OK, data: { ...contacts } });
 };
 
 const getById = async (req, res, next) => {
-  const { contactId } = req.params;
-
-  const contact = await repositoryContacts.getContactById(contactId);
+  const { id } = req.params;
+  const { id: userId } = req.user;
+  const contact = await repositoryContacts.getContactById(userId, id);
 
   if (!contact) {
     return res.status(httpCode.NOT_FOUND).json({
       status: "error",
       code: httpCode.NOT_FOUND,
       data: { contact },
-      message: `Not found contact with id '${contactId}'`,
+      message: `Not found contact with id '${id}'`,
     });
   }
 
@@ -28,7 +29,8 @@ const getById = async (req, res, next) => {
 };
 
 const addContact = async (req, res, next) => {
-  const newContact = await repositoryContacts.addContact(req.body);
+  const { id: userId } = req.user;
+  const newContact = await repositoryContacts.addContact(userId, req.body);
   res.status(httpCode.CREATED).json({
     status: "success",
     code: httpCode.CREATED,
@@ -37,14 +39,15 @@ const addContact = async (req, res, next) => {
 };
 
 const removeContact = async (req, res, next) => {
-  const { contactId } = req.params;
-  const deletedContact = await repositoryContacts.removeContact(contactId);
+  const { id: userId } = req.user;
+  const { id } = req.params;
+  const deletedContact = await repositoryContacts.removeContact(userId, id);
 
   if (!deletedContact) {
     res.status(httpCode.NOT_FOUND).json({
       status: "error",
       code: httpCode.NOT_FOUND,
-      message: `Not found contact with id '${contactId}'`,
+      message: `Not found contact with id '${id}'`,
     });
     return;
   }
@@ -57,8 +60,9 @@ const removeContact = async (req, res, next) => {
 };
 
 const updateContact = async (req, res, next) => {
-  const { contactId } = req.params;
-  const contact = await repositoryContacts.updateContact(contactId, req.body);
+  const { id: userId } = req.user;
+  const { id } = req.params;
+  const contact = await repositoryContacts.updateContact(userId, id, req.body);
 
   if (contact) {
     res.status(httpCode.OK).json({
@@ -72,7 +76,7 @@ const updateContact = async (req, res, next) => {
       status: "error",
       code: httpCode.NOT_FOUND,
       data: { contact },
-      message: `Not found contact with id '${contactId}'`,
+      message: `Not found contact with id '${id}'`,
     });
   }
 };

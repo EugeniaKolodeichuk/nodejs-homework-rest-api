@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
-const { Schema, model } = mongoose;
+/* const { Schema, model } = mongoose; */
+import pkg from "mongoose";
+const { Schema, model, SchemaTypes } = pkg;
 
 const contactSchema = new Schema(
   {
@@ -16,6 +18,10 @@ const contactSchema = new Schema(
     favorite: {
       type: Boolean,
       default: false,
+    },
+    owner: {
+      type: SchemaTypes.ObjectId,
+      ref: "user",
     },
   },
   { versionKey: false, timestamps: true }

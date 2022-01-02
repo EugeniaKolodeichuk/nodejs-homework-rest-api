@@ -41,4 +41,25 @@ const logout = async (req, res, next) => {
     .json({ status: "success", code: httpCode.OK, data: {} });
 };
 
-export { registration, login, logout };
+const current = async (req, res) => {
+  const { email } = req.user;
+  console.log(req.user);
+  if (!req.user.token || !req.user.id) {
+    return res.status(httpCode.UNAUTHORIZED).json({
+      status: "error",
+      code: httpCode.UNAUTHORIZED,
+      message: "Invalid credentials",
+    });
+  }
+  res.json({
+    status: "success",
+    code: httpCode.OK,
+    data: {
+      user: {
+        email,
+      },
+    },
+  });
+};
+
+export { registration, login, logout, current };

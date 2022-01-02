@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+import pkg from "jsonwebtoken";
 import Users from "../repository/usersRepository.js";
 
 const SECRET_KEY = process.env.JWT_SECRET_KEY;
@@ -10,10 +10,8 @@ class AuthService {
   }
 
   async create(body) {
-    const { password, email, subscription, owner, role } = await Users.create(
-      body
-    );
-    return { password, email, subscription, owner, role };
+    const { password, email, subscription, role } = await Users.create(body);
+    return { password, email, subscription, role };
   }
 
   async getUser(email, password) {
@@ -26,9 +24,9 @@ class AuthService {
   }
 
   getToken(user) {
-    const { id, email } = user.id;
+    const { id, email } = user;
     const payload = { id, email };
-    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "8h" });
+    const token = pkg.sign(payload, SECRET_KEY, { expiresIn: "10h" });
     return token;
   }
 

@@ -63,7 +63,7 @@ export const validateUpdateFavorite = async (req, res, next) => {
 };
 
 export const validateId = (req, res, next) => {
-  if (!Types.ObjectId.isValid(req.params.contactId)) {
+  if (!Types.ObjectId.isValid(req.params.id)) {
     return res.status(400).json({ message: "Invalid ObjectId" });
   }
   next();

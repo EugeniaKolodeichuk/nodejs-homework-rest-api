@@ -21,16 +21,16 @@ import guard from "../../middlewares/guard.js";
 
 router.get("/", [guard, validateQuery], listContacts);
 
-router.get("/:contactId", [guard, validateId], getById);
+router.get("/:id", [guard, validateId], getById);
 
 router.post("/", [guard, validateCreate], addContact);
 
-router.delete("/:contactId", [guard, validateId], removeContact);
+router.delete("/:id", [guard, validateId], removeContact);
 
-router.put("/:contactId", [guard, validateId, validateUpdate], updateContact);
+router.put("/:id", [guard, validateId, validateUpdate], updateContact);
 
 router.patch(
-  "/:contactId/favorite",
+  "/:id/favorite",
   [guard, validateId, validateUpdateFavorite],
   updateContact
 );

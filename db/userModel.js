@@ -33,10 +33,6 @@ const userSchema = new Schema(
       type: String,
       default: null,
     },
-    owner: {
-      type: SchemaTypes.ObjectId,
-      ref: "user",
-    },
     role: {
       type: String,
       enum: {
@@ -58,9 +54,9 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.methods.isValidPassword = async function (password) {
-  return await bcrypt.compare(password, this.password);
+  return bcrypt.compare(password, this.password);
 };
 
-const User = model("User", userSchema);
+const User = model("user", userSchema);
 
 export default User;
