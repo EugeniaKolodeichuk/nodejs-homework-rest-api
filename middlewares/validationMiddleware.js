@@ -27,6 +27,16 @@ const querySchema = Joi.object({
   filter: Joi.string().pattern(new RegExp("(favorite)")).optional(),
 });
 
+const registrationSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().required(),
+});
+
+const loginSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().required(),
+});
+
 export const validateCreate = async (req, res, next) => {
   try {
     await postSchema.validateAsync(req.body);
@@ -74,6 +84,24 @@ export const validateQuery = async (req, res, next) => {
     await querySchema.validateAsync(req.query);
   } catch (err) {
     return res.status(400).json({ message: err.message.replace(/"/g, "") });
+  }
+  next();
+};
+
+export const validateRegistration = async (req, res, next) => {
+  try {
+    await registrationSchema.validateAsync(req.body);
+  } catch (err) {
+    return res.status(400).json({ message: "Bad Request" });
+  }
+  next();
+};
+
+export const validateLogin = async (req, res, next) => {
+  try {
+    await loginSchema.validateAsync(req.body);
+  } catch (err) {
+    return res.status(400).json({ message: "Bad Request" });
   }
   next();
 };
