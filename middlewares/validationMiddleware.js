@@ -38,7 +38,6 @@ module.exports = {
     }
     next();
   },
-
   validateUpdateFavorite: (req, res, next) => {
     const schema = Joi.object({
       favorite: Joi.bool().required(),
