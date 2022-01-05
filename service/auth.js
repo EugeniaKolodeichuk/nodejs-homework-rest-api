@@ -1,4 +1,4 @@
-import jsonwebtoken from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import Users from "../repository/usersRepository.js";
 
 const SECRET_KEY = process.env.JWT_SECRET_KEY;
@@ -26,7 +26,7 @@ class AuthService {
   getToken(user) {
     const { id, email } = user;
     const payload = { id, email };
-    const token = jsonwebtoken.sign(payload, SECRET_KEY, { expiresIn: "10h" });
+    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "10h" });
     return token;
   }
 
