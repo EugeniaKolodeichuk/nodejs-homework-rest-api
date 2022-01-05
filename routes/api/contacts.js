@@ -1,32 +1,38 @@
-const express = require("express");
-const router = express.Router();
+import { Router } from "express";
+const router = new Router();
 
-const {
-  addContactValidation,
-  putContactValidation,
-  validateUpdateFavorite,
+import {
+  validateCreate,
+  validateUpdate,
   validateId,
-} = require("../../middlewares/validationMiddleware");
+  validateUpdateFavorite,
+  validateQuery,
+} from "../../middlewares/validationMiddleware.js";
 
-const {
+import {
   listContacts,
   getById,
   removeContact,
   addContact,
   updateContact,
-  updateStatusContact,
-} = require("../../controllers/contactsController");
+} from "../../controllers/contactsController.js";
 
-router.get("/", listContacts);
-router.get("/:contactId", validateId, getById);
-router.post("/", addContactValidation, addContact);
-router.delete("/:contactId", validateId, removeContact);
-router.put("/:contactId", validateId, putContactValidation, updateContact);
+import guard from "../../middlewares/guard.js";
+
+router.get("/", [guard, validateQuery], listContacts);
+
+router.get("/:id", [guard, validateId], getById);
+
+router.post("/", [guard, validateCreate], addContact);
+
+router.delete("/:id", [guard, validateId], removeContact);
+
+router.put("/:id", [guard, validateId, validateUpdate], updateContact);
+
 router.patch(
-  "/:contactId/favorite",
-  validateId,
-  validateUpdateFavorite,
-  updateStatusContact
+  "/:id/favorite",
+  [guard, validateId, validateUpdateFavorite],
+  updateContact
 );
 
-module.exports = router;
+export default router;

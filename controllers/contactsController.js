@@ -1,79 +1,85 @@
-const { Contact } = require("../db/contactsModel");
+import repositoryContacts from "../repository/contactsRepository.js";
+import { httpCode } from "../lib/constants.js";
 
 const listContacts = async (req, res, next) => {
-  const contacts = await Contact.find({});
-  res.status(200).json({ contacts, status: "success" });
+  const { id: userId } = req.user;
+  const contacts = await repositoryContacts.listContacts(userId, req.query);
+  res
+    .status(httpCode.OK)
+    .json({ status: "success", code: httpCode.OK, data: { ...contacts } });
 };
 
 const getById = async (req, res, next) => {
-  const { contactId } = req.params;
-  const contact = await Contact.findById(contactId);
+  const { id } = req.params;
+  const { id: userId } = req.user;
+  const contact = await repositoryContacts.getContactById(userId, id);
 
   if (!contact) {
-    return res
-      .status(404)
-      .json({ message: `Not found contact with id '${contactId}'` });
+    return res.status(httpCode.NOT_FOUND).json({
+      status: "error",
+      code: httpCode.NOT_FOUND,
+      data: { contact },
+      message: `Not found contact with id '${id}'`,
+    });
   }
 
-  res.status(200).json({ contact, status: "success" });
+  res
+    .status(httpCode.OK)
+    .json({ status: "success", code: httpCode.OK, data: { contact } });
 };
 
 const addContact = async (req, res, next) => {
-  const { name, email, phone, favorite = false } = req.body;
-  const newContact = { name, email, phone, favorite };
-  const contacts = new Contact(newContact);
-  await contacts.save();
-  res.status(201).json({ newContact, status: "success" });
+  const { id: userId } = req.user;
+  const newContact = await repositoryContacts.addContact(userId, req.body);
+  res.status(httpCode.CREATED).json({
+    status: "success",
+    code: httpCode.CREATED,
+    data: { contact: newContact },
+  });
 };
 
 const removeContact = async (req, res, next) => {
-  const { contactId } = req.params;
-  const deletedContact = await Contact.findByIdAndRemove(contactId);
+  const { id: userId } = req.user;
+  const { id } = req.params;
+  const deletedContact = await repositoryContacts.removeContact(userId, id);
 
   if (!deletedContact) {
-    res
-      .status(404)
-      .json({ message: `Not found contact with id '${contactId}'` });
+    res.status(httpCode.NOT_FOUND).json({
+      status: "error",
+      code: httpCode.NOT_FOUND,
+      message: `Not found contact with id '${id}'`,
+    });
     return;
   }
-  res.status(200).json({ deletedContact, message: "Contact deleted" });
+  res.status(httpCode.OK).json({
+    status: "success",
+    code: httpCode.OK,
+    data: { contact: deletedContact },
+    message: "Contact deleted",
+  });
 };
 
 const updateContact = async (req, res, next) => {
-  const { name, email, phone, favorite } = req.body;
-  const { contactId } = req.params;
+  const { id: userId } = req.user;
+  const { id } = req.params;
+  const contact = await repositoryContacts.updateContact(userId, id, req.body);
 
-  const newContact = await Contact.findByIdAndUpdate(contactId, {
-    $set: { name, email, phone, favorite },
-  });
-
-  if (newContact) {
-    res.status(200).json({ newContact, status: "Contact changed" });
+  if (contact) {
+    res.status(httpCode.OK).json({
+      status: "success",
+      code: httpCode.OK,
+      data: { contact },
+      message: "Contact changed",
+    });
   } else {
-    res.status(404).json({ message: "Not found" });
+    res.status(httpCode.NOT_FOUND).json({
+      status: "error",
+      code: httpCode.NOT_FOUND,
+      data: { contact },
+      message: `Not found contact with id '${id}'`,
+    });
   }
 };
 
-const updateStatusContact = async (req, res, next) => {
-  const { favorite } = req.body;
-  const { contactId } = req.params;
+export { listContacts, getById, removeContact, addContact, updateContact };
 
-  const changedContact = await Contact.findByIdAndUpdate(contactId, {
-    $set: { favorite },
-  });
-
-  if (changedContact) {
-    res.status(200).json({ changedContact, status: "Contact changed" });
-  } else {
-    res.status(404).json({ message: "Not found" });
-  }
-};
-
-module.exports = {
-  listContacts,
-  getById,
-  removeContact,
-  addContact,
-  updateContact,
-  updateStatusContact,
-};
