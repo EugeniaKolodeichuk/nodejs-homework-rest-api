@@ -1,7 +1,7 @@
 import Contact from "../db/contactsModel.js";
 
 const listContacts = async (userId) => {
-  const total = await Contact.find({ owner: userId }).countDocuments();
+  const total = await Contact.countDocuments({ owner: userId });
   let result = await Contact.find({ owner: userId });
   return { total, contacts: result };
 };

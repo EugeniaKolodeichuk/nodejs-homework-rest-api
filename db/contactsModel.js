@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
-/* const { Schema, model } = mongoose; */
-import pkg from "mongoose";
-const { Schema, model, SchemaTypes } = pkg;
+
+const { Schema, model, SchemaTypes } = mongoose;
 
 const contactSchema = new Schema(
   {

@@ -1,13 +1,8 @@
-/* import pkg from "mongoose"; */
-/* const { Schema, model } = mongoose; */
-import { Role } from "../lib/constants";
-/* import { SchemaTypes } from "mongoose"; */
-/* const { SchemaTypes } = pkg; */
-/* const { Schema, model } = pkg;
-import { SchemaTypes } from "mongoose"; */
-import pkg from "mongoose";
 import bcrypt from "bcryptjs";
-const { Schema, model, SchemaTypes } = pkg;
+import mongoose from "mongoose";
+import { Role } from "../lib/constants";
+
+const { Schema, model, SchemaTypes } = mongoose;
 
 const userSchema = new Schema(
   {
