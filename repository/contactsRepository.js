@@ -30,10 +30,16 @@ const updateContact = async (userId, id, body) => {
   return result;
 };
 
+const getStatisticsContacts = async (id) => {
+  const data = await Contact.aggregate([]);
+  return data;
+};
+
 export default {
   listContacts,
   getContactById,
   removeContact,
   addContact,
   updateContact,
+  getStatisticsContacts,
 };
