@@ -3,7 +3,6 @@ import { httpCode } from "../lib/constants.js";
 import {
   UploadFileService,
   LocalFileStorage,
-  CloudFileStorage,
 } from "../service/file-storage/index.js";
 
 const aggregation = async (req, res, next) => {

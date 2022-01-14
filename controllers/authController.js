@@ -1,20 +1,25 @@
 import { httpCode } from "../lib/constants.js";
-import AuthService from "../service/auth.js";
-const authService = new AuthService();
+import authService from "../service/auth.js";
 
 const registration = async (req, res, next) => {
-  const { email } = req.body;
-  const isUserExist = await authService.isUserExist(email);
-  if (isUserExist) {
-    return res.status(httpCode.CONFLICT).json({
-      status: "error",
-      code: httpCode.CONFLICT,
-      message: "Email is already exist",
-    });
-  }
-  const data = await authService.create(req.body);
+  try {
+    const { email } = req.body;
+    const isUserExist = await authService.isUserExist(email);
+    if (isUserExist) {
+      return res.status(httpCode.CONFLICT).json({
+        status: "error",
+        code: httpCode.CONFLICT,
+        message: "Email is already exist",
+      });
+    }
+    const data = await authService.create(req.body);
 
-  res.status(httpCode.OK).json({ status: "success", code: httpCode.OK, data });
+    res
+      .status(httpCode.CREATED)
+      .json({ status: "success", code: httpCode.CREATED, data });
+  } catch (err) {
+    next(err);
+  }
 };
 
 const login = async (req, res, next) => {

@@ -1,6 +1,4 @@
 import { Router } from "express";
-import { upload } from "../../middlewares/upload.js";
-import { uploadAvatar } from "../../controllers/userController.js";
 
 const router = new Router();
 import {
@@ -21,6 +19,5 @@ router.post("/registration", validateRegistration, registration);
 router.post("/login", validateLogin, login);
 router.post("/logout", guard, logout);
 router.get("/current", guard, current);
-/* router.patch("/avatar", guard, upload.single("avatar"), uploadAvatar); */
 
 export default router;
