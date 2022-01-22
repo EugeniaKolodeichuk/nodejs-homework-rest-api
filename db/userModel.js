@@ -51,7 +51,7 @@ const userSchema = new Schema(
     verificationToken: {
       type: String,
       required: [true, "Verify token is required"],
-      default: randomUUID(),
+      default: randomUUID,
     },
   },
   { versionKey: false, timestamps: true }
